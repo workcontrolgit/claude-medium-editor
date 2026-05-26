@@ -1,0 +1,212 @@
+# claude-medium-editor
+
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Platform](https://img.shields.io/badge/platform-Claude%20Code-blueviolet)
+
+A Claude Code plugin that automates Medium.com article editing from your terminal. Sync content from local markdown files, insert images, update series navigation links, and publish drafts — no browser clicking required.
+
+> Medium has no public write API. This plugin automates the live Medium editor via the [Playwright MCP](https://github.com/microsoft/playwright-mcp) browser.
+
+---
+
+## Quick Start
+
+### Prerequisites
+
+- [Claude Code](https://claude.ai/code) installed
+- Node.js 18+ (for Playwright MCP)
+
+### Install
+
+```bash
+claude plugin install github:workcontrolgit/claude-medium-editor
+```
+
+This registers the `medium-editor` skill and configures the Playwright MCP server automatically.
+
+### First Run
+
+1. Open Claude Code in your project directory
+2. Run `/medium-editor list-drafts` — a browser window opens
+3. If redirected to Medium's login page, sign in once manually
+4. Your session persists — you won't need to log in again
+5. *(Optional)* Copy the article registry template into your project:
+
+```bash
+cp <plugin-dir>/templates/medium-public-url.json medium/medium-public-url.json
+# Fill in your editId values
+```
+
+The `editId` is in your Medium editor URL: `https://medium.com/p/{editId}/edit`
+
+---
+
+## Commands
+
+All commands are invoked as `/medium-editor <operation> [args]`.
+
+| Operation | Description | Example |
+|---|---|---|
+| `list-drafts` | List all draft articles from your submissions outbox | `/medium-editor list-drafts` |
+| `update-article` | Replace draft body with content from a local markdown file | `/medium-editor update-article abc123 ./post.md` |
+| `create-new-article` | Create a new Medium draft from a local markdown file | `/medium-editor create-new-article ./post.md` |
+| `insert-image` | Insert a local image after a specific anchor paragraph | `/medium-editor insert-image abc123 "Anchor text" ./img.png` |
+| `replace-text` | Replace a specific phrase anywhere in the article | `/medium-editor replace-text abc123 "old text" "new text"` |
+| `update-series-links` | Update all series navigation links to use Medium URLs | `/medium-editor update-series-links` |
+| `publish-article` | Walk through the full publish flow with topics | `/medium-editor publish-article abc123` |
+
+### Article Registry (series writers)
+
+If you write a multi-part series, copy `templates/medium-public-url.json` into your project at `medium/medium-public-url.json` and fill in your article details:
+
+```json
+[
+  {
+    "part": 1,
+    "title": "Part 1: Your Article Title",
+    "editId": "abc123def456",
+    "editUrl": "https://medium.com/p/abc123def456/edit",
+    "draftUrl": "https://medium.com/publication/your-slug-abc123def456"
+  }
+]
+```
+
+Commands like `update-series-links` use this registry to resolve URLs across all parts. For one-off edits, pass `editId` directly — no registry needed.
+
+---
+
+## Limitations
+
+### Hard (no workaround)
+
+- **Cloudflare bot detection** — A fresh headless browser is blocked by Medium on first launch. Sign in once manually; the session persists afterward.
+- **No public Medium write API** — All automation goes through the live browser editor DOM. A Medium editor redesign could break selectors.
+- **Large paste + reload = doubled content** — Medium's OT sync merges the stale server version with your local draft on reload. Never reload after a large paste.
+- **No rollback** — Medium's undo history clears on page reload. Your local markdown file is the source of truth.
+
+### Soft (workarounds exist)
+
+- **Windows paths** — `browser_file_upload` requires `C:\\absolute\\path\\to\\image.png`. macOS/Linux use forward slashes.
+- **Code blocks render as plain paragraphs** — Medium doesn't parse `<pre><code>` from clipboard paste as syntax-highlighted blocks.
+- **One article at a time** — No batch update across multiple drafts in a single session.
+
+---
+
+## How It Works
+
+### Why browser automation
+
+Medium provides no public write API. The plugin controls the live Medium editor in a real browser using the [Playwright MCP server](https://github.com/microsoft/playwright-mcp), which exposes browser actions (click, type, file upload, evaluate JS) as Claude tools.
+
+### Architecture
+
+```
+/medium-editor <operation>
+       │
+       ▼
+  SKILL.md          ← routing logic + DOM facts (~150 lines)
+       │
+       ▼
+  references/       ← one file per operation, loaded on demand
+  ├── update-article.md
+  ├── create-new-article.md
+  ├── insert-image.md
+  ├── replace-text.md
+  ├── update-series-links.md
+  ├── publish-article.md
+  ├── dom-facts.md
+  └── troubleshooting.md
+       │
+       ▼
+  Playwright MCP     ← browser automation tools
+       │
+       ▼
+  Medium Editor DOM
+```
+
+`SKILL.md` stays lean so Claude loads only the one reference file needed per operation — keeping per-invocation token cost low.
+
+### Repository Structure
+
+```
+claude-medium-editor/
+├── .claude-plugin/
+│   └── plugin.json            # name, description, author, version
+├── .mcp.json                  # Playwright MCP server auto-config
+├── LICENSE
+├── README.md
+├── templates/
+│   └── medium-public-url.json # starter registry template for series writers
+└── skills/
+    └── medium-editor/
+        ├── SKILL.md           # routing logic + key DOM facts
+        └── references/
+            ├── update-article.md
+            ├── create-new-article.md
+            ├── insert-image.md
+            ├── replace-text.md
+            ├── update-series-links.md
+            ├── publish-article.md
+            ├── dom-facts.md
+            └── troubleshooting.md
+```
+
+### Key DOM Selectors
+
+| Element | Selector |
+|---|---|
+| Editor body | `.editor-inner[contenteditable="true"]` |
+| Article title | `.graf--title` |
+| Inline image menu | `[data-testid="editorAddButton"]` |
+| Save status | `div`/`span` with `textContent === 'Saved'` |
+
+### Critical Behavioral Rules
+
+These constraints were discovered through live editor testing. Violating them causes content corruption or failed saves.
+
+1. **Never reload after a large paste.** Medium's OT system merges the stale server version with the local draft on reload, producing doubled content. Insert all images in the same session as the paste, before any navigation.
+
+2. **Ctrl+A → Ctrl+V for full replacement.** Include the article title as `<h3>` in the pasted HTML. This is the only approach that cleanly replaces all content without server-side merge artifacts.
+
+3. **Cursor placement matters.** Place the cursor at the start of the subtitle `<p>` (not inside the title `<h3>`) before selecting and pasting. Placing the cursor inside the title causes the first pasted block to merge into it.
+
+4. **Image insertion requires clean editor state.** The inline `+` menu works only when the editor state is not corrupted by programmatic `setRange()` calls. Always insert images after paste, and use the Selection API (not raw `document.createRange()` hacks) to set cursor position.
+
+5. **List items need two Enter presses to exit.** When the anchor text is inside a `<li>`, pressing Enter once creates a new list item. Press Enter twice (or Enter + Backspace) to exit and land on a blank `<p>` where the inline menu appears.
+
+6. **`execCommand('delete')` on large ranges does not persist.** Medium's save API only persists changes made through its own editor input model. Use paste replacement instead of programmatic deletion for large content changes.
+
+---
+
+## Contributing
+
+### Adding a New Platform Skill
+
+The repo is structured to support additional platforms without breaking the existing `medium-editor` skill:
+
+1. Create `skills/<platform>-editor/SKILL.md` + `references/` subfolder
+2. Add an entry to `.claude-plugin/plugin.json`:
+
+```json
+{
+  "skills": [
+    { "name": "medium-editor", "path": "skills/medium-editor/SKILL.md" },
+    { "name": "dev-to-editor", "path": "skills/dev-to-editor/SKILL.md" }
+  ]
+}
+```
+
+### Roadmap
+
+| Skill | Platform |
+|---|---|
+| `dev-to-editor` | dev.to article automation |
+| `hashnode-editor` | Hashnode article automation |
+| `linkedin-article` | LinkedIn long-form article posting |
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE)
