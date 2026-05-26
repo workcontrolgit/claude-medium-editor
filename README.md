@@ -19,8 +19,16 @@ A Claude Code plugin that automates Medium.com article editing from your termina
 
 ### Install
 
+**Step 1 — Register the marketplace (one-time setup):**
+
 ```bash
-claude plugin install github:workcontrolgit/claude-medium-editor
+claude plugin marketplace add workcontrolgit/claude-medium-editor
+```
+
+**Step 2 — Install the plugin:**
+
+```bash
+claude plugin install claude-medium-editor
 ```
 
 This registers the `medium-editor` skill and configures the Playwright MCP server automatically.
@@ -198,16 +206,7 @@ These constraints were discovered through live editor testing. Violating them ca
 The repo is structured to support additional platforms without breaking the existing `medium-editor` skill:
 
 1. Create `skills/<platform>-editor/SKILL.md` + `references/` subfolder
-2. Add an entry to `.claude-plugin/plugin.json`:
-
-```json
-{
-  "skills": [
-    { "name": "medium-editor", "path": "skills/medium-editor/SKILL.md" },
-    { "name": "dev-to-editor", "path": "skills/dev-to-editor/SKILL.md" }
-  ]
-}
-```
+2. Skills are auto-discovered from the `skills/` directory — no changes to `plugin.json` needed
 
 ### Roadmap
 
