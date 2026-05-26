@@ -1,3 +1,8 @@
+---
+name: medium-editor
+description: Use when automating Medium.com article editing — updating article content from local markdown, creating new articles, inserting images, replacing text, updating series links, or publishing articles via Playwright browser automation.
+---
+
 # medium-editor skill
 
 Automate Medium.com article editing via the Playwright MCP browser.
@@ -6,17 +11,19 @@ Automate Medium.com article editing via the Playwright MCP browser.
 
 ```
 /medium-editor list-drafts
+/medium-editor populate-registry
 /medium-editor update-article <editId> <path/to/local.md>
 /medium-editor create-new-article <path/to/local.md>
 /medium-editor insert-image <editId> "<anchor paragraph text>" <path/to/image.png>
 /medium-editor replace-text <editId> "<old text>" "<new text>"
-/medium-editor update-series-links
+/medium-editor update-links <editId>
+/medium-editor update-links --all
 /medium-editor publish-article <editId>
 ```
 
 `editId` is found in the Medium editor URL: `https://medium.com/p/{editId}/edit`
 
-For `update-series-links`, the registry `medium/medium-public-url.json` must exist in the current working directory (copy from `templates/medium-public-url.json` and fill in your values).
+For `update-links`, the registry `medium/medium-public-url.json` must exist in the current working directory. Run `/medium-editor populate-registry` to build it if missing.
 
 ---
 
@@ -50,11 +57,12 @@ These apply to ALL operations. Never use deprecated selectors.
 
 | Operation | Reference file |
 |---|---|
+| `populate-registry` | `references/populate-registry.md` |
 | `update-article` | `references/update-article.md` |
 | `create-new-article` | `references/create-new-article.md` |
 | `insert-image` | `references/insert-image.md` |
 | `replace-text` | `references/replace-text.md` |
-| `update-series-links` | `references/update-series-links.md` |
+| `update-links` | `references/update-links.md` |
 | `publish-article` | `references/publish-article.md` |
 | DOM facts & selectors | `references/dom-facts.md` |
 | Troubleshooting | `references/troubleshooting.md` |
