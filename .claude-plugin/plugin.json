@@ -1,0 +1,15 @@
+{
+  "name": "claude-medium-editor",
+  "description": "Automate Medium.com article editing — sync content from local markdown, insert images, update series links, and publish — using Claude Code and Playwright.",
+  "author": {
+    "name": "Fuji Nguyen",
+    "url": "https://github.com/workcontrolgit"
+  },
+  "version": "1.0.0",
+  "skills": [
+    {
+      "name": "medium-editor",
+      "path": "skills/medium-editor/SKILL.md"
+    }
+  ]
+}
