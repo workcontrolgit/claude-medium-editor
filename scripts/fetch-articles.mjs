@@ -2,16 +2,17 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-const JSONP_PREFIX = '])}while(1);</x>';
-
 export function parseResponse(raw) {
-  const json = JSON.parse(raw.replace(JSONP_PREFIX, ''));
+  if (!raw.startsWith('])}while(1);</x>')) {
+    throw new Error('Unexpected response format: missing JSONP prefix');
+  }
+  const json = JSON.parse(raw.replace(/^\]\)\}while\(1\);<\/x>/, ''));
   const posts = Object.values(json?.payload?.references?.Post ?? {});
   return posts;
 }
 
 export function mapToRegistry(posts) {
-  return posts
+  return [...posts]
     .sort((a, b) => b.firstPublishedAt - a.firstPublishedAt)
     .map((post, i) => ({
       part: i + 1,

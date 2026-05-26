@@ -45,3 +45,14 @@ test('mapToRegistry returns empty array for empty input', () => {
   const registry = mapToRegistry([]);
   assert.deepEqual(registry, []);
 });
+
+test('parseResponse throws on missing JSONP prefix', () => {
+  const raw = JSON.stringify({ payload: { references: { Post: {} } } });
+  assert.throws(() => parseResponse(raw), /missing JSONP prefix/);
+});
+
+test('parseResponse returns empty array when payload is missing', () => {
+  const raw = '])}while(1);</x>' + JSON.stringify({});
+  const posts = parseResponse(raw);
+  assert.deepEqual(posts, []);
+});
