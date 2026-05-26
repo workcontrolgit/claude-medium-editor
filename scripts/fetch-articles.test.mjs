@@ -1,7 +1,7 @@
 // scripts/fetch-articles.test.mjs
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseResponse, mapToRegistry } from './fetch-articles.mjs';
+import { parseResponse, mapToRegistry, fetchMediumJson } from './fetch-articles.mjs';
 
 const JSONP_PREFIX = '])}while(1);</x>';
 
@@ -55,4 +55,19 @@ test('parseResponse returns empty array when payload is missing', () => {
   const raw = '])}while(1);</x>' + JSON.stringify({});
   const posts = parseResponse(raw);
   assert.deepEqual(posts, []);
+});
+
+test('fetchMediumJson throws on non-200 response', async () => {
+  const fakeFetch = async () => ({ ok: false, status: 403 });
+  await assert.rejects(
+    () => fetchMediumJson('baduser', fakeFetch),
+    /403/
+  );
+});
+
+test('fetchMediumJson returns raw text on success', async () => {
+  const fakeRaw = '])}while(1);</x>' + JSON.stringify({ payload: { references: { Post: {} } } });
+  const fakeFetch = async () => ({ ok: true, text: async () => fakeRaw });
+  const result = await fetchMediumJson('gooduser', fakeFetch);
+  assert.equal(result, fakeRaw);
 });

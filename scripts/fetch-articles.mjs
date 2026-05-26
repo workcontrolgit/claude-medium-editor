@@ -22,3 +22,12 @@ export function mapToRegistry(posts) {
       draftUrl: `https://medium.com/p/${post.id}`,
     }));
 }
+
+export async function fetchMediumJson(username, fetchFn = fetch) {
+  const url = `https://medium.com/@${username}?format=json`;
+  const res = await fetchFn(url);
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status} fetching ${url}`);
+  }
+  return res.text();
+}
