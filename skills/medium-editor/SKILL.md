@@ -1,6 +1,6 @@
 ---
 name: medium-editor
-description: Use when automating Medium.com article editing — updating article content from local markdown, creating new articles, inserting images, replacing text, updating series links, or publishing articles via Playwright browser automation.
+description: Use when automating Medium.com article editing — updating article content from local markdown, creating new articles, inserting images, replacing text, updating article links, or publishing articles via Playwright browser automation.
 ---
 
 # medium-editor skill
@@ -49,7 +49,7 @@ These apply to ALL operations. Never use deprecated selectors.
 
 - **Link updates**: use `document.execCommand('createLink', false, url)` — reliable and proven
 - **Clipboard paste**: copy via temp div + `execCommand('copy')`, paste with Ctrl+V — only reliable injection method
-- **Series header text**: lives in raw text nodes, not `<strong>` — use TreeWalker to locate
+- **Link element walking**: use element walker for `<A>` tags — do not use text node walker for link updates
 
 ---
 
