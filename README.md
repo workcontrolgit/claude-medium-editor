@@ -42,7 +42,7 @@ This registers the `medium-editor` skill and configures the Playwright MCP serve
 5. *(Optional)* Copy the article registry template into your project:
 
 ```bash
-cp <plugin-dir>/templates/medium-public-url.json ~/~/medium/medium-public-url.json
+cp <plugin-dir>/templates/medium-public-url.json ~/medium/medium-public-url.json
 # Fill in your editId values
 ```
 
@@ -56,8 +56,12 @@ All commands are invoked as `/medium-editor <operation> [args]`.
 
 | Operation | Description | Example |
 |---|---|---|
-| `list-drafts` | List all draft articles from your submissions outbox | `/medium-editor list-drafts` |
-| `populate-registry` | Scrape published articles and build `~/medium/medium-public-url.json` | `/medium-editor populate-registry` |
+| `list-drafts` | List all draft articles | `/medium-editor list-drafts` |
+| `list-published` | List published articles (paginated) | `/medium-editor list-published` |
+| `list-scheduled` | List scheduled articles | `/medium-editor list-scheduled` |
+| `list-submissions` | List articles submitted to a publication, pending approval | `/medium-editor list-submissions` |
+| `list-unlisted` | List unlisted (published but not indexed) articles | `/medium-editor list-unlisted` |
+| `populate-registry` | Scrape all tabs and build `~/medium/medium-public-url.json` | `/medium-editor populate-registry` |
 | `update-article` | Replace draft body with content from a local markdown file | `/medium-editor update-article abc123 ./post.md` |
 | `create-new-article` | Create a new Medium draft from a local markdown file | `/medium-editor create-new-article ./post.md` |
 | `insert-image` | Insert a local image after a specific anchor paragraph | `/medium-editor insert-image abc123 "Anchor text" ./img.png` |
@@ -144,6 +148,7 @@ Medium provides no public write API. The plugin controls the live Medium editor 
        │
        ▼
   references/       ← one file per operation, loaded on demand
+  ├── list-stories.md
   ├── populate-registry.md
   ├── update-article.md
   ├── create-new-article.md
@@ -178,6 +183,7 @@ claude-medium-editor/
     └── medium-editor/
         ├── SKILL.md           # routing logic + key DOM facts
         └── references/
+            ├── list-stories.md
             ├── populate-registry.md
             ├── update-article.md
             ├── create-new-article.md
