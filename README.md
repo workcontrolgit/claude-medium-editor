@@ -144,20 +144,21 @@ Medium provides no public write API. The plugin controls the live Medium editor 
 /medium-editor <operation>
        │
        ▼
-  SKILL.md          ← routing logic + DOM facts (~150 lines)
+  SKILL.md          ← routing logic + DOM facts
        │
        ▼
   references/       ← one file per operation, loaded on demand
-  ├── list-stories.md
-  ├── populate-registry.md
-  ├── update-article.md
-  ├── create-new-article.md
-  ├── insert-image.md
-  ├── replace-text.md
-  ├── update-links.md
-  ├── publish-article.md
-  ├── dom-facts.md
-  └── troubleshooting.md
+  ├── list-stories.md        list-drafts, list-published, list-scheduled,
+  │                          list-submissions, list-unlisted
+  ├── populate-registry.md   populate-registry
+  ├── update-article.md      update-article
+  ├── create-new-article.md  create-new-article
+  ├── insert-image.md        insert-image
+  ├── replace-text.md        replace-text
+  ├── update-links.md        update-links, update-links --all
+  ├── publish-article.md     publish-article
+  ├── dom-facts.md           shared DOM selectors reference
+  └── troubleshooting.md     shared troubleshooting guide
        │
        ▼
   Playwright MCP     ← browser automation tools
