@@ -23,12 +23,40 @@ This navigates to the submission page:
 
 Wait for the page to load. Confirm the three sections are visible: **Story preview**, **Topics**, **Publication**.
 
-### 3. Set story preview (optional)
+### 3. Set story preview
 
-Ask the user if they want to update the preview title or subtitle. If yes:
+#### Preview subtitle (auto-generate)
+
+Before navigating to the submission page, read the article body from `.editor-inner[contenteditable="true"]`:
+
+```js
+document.querySelector('.editor-inner[contenteditable="true"]').innerText.trim().substring(0, 2000);
+```
+
+Use the article text to write a concise, compelling subtitle — max 140 characters. The subtitle should summarise the article's key value or finding in plain language, suitable as a teaser for readers browsing Medium.
+
+**Rules:**
+- Max 140 characters (enforced by Medium)
+- Do not start with "In this article" or "This post"
+- Write as a sentence fragment or short sentence — no trailing period needed
+- Prefer concrete over vague: "Build a .NET MCP server with 5 tools in under an hour" > "Learn about MCP servers"
+
+Present the generated subtitle to the user for approval before filling it in. If they want a revision, generate an alternative.
+
+Once approved, fill in the subtitle field:
+
+```js
+const subtitleBox = document.querySelector('textarea[placeholder*="preview subtitle"], input[placeholder*="preview subtitle"]')
+  || Array.from(document.querySelectorAll('div[contenteditable="true"], textarea')).find(el => el.closest('[aria-label*="subtitle"]'));
+```
+
+Or target by placeholder text via `browser_fill_form` / `browser_click` + `browser_type` on the `textbox "Story preview subtitle"` element.
+
+#### Preview title (optional)
+
+The preview title defaults to the article title. Only change it if the user asks.
 
 - Preview title: `textbox` with placeholder `"Write a preview title"` — select all and type new value
-- Preview subtitle: `textbox` with placeholder `"Write a preview subtitle..."` — select all and type new value (max 140 chars)
 
 ### 4. Add topics/tags
 
