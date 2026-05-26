@@ -11,6 +11,10 @@ Automate Medium.com article editing via the Playwright MCP browser.
 
 ```
 /medium-editor list-drafts
+/medium-editor list-published
+/medium-editor list-scheduled
+/medium-editor list-submissions
+/medium-editor list-unlisted
 /medium-editor populate-registry
 /medium-editor update-article <editId> <path/to/local.md>
 /medium-editor create-new-article <path/to/local.md>
@@ -57,6 +61,7 @@ These apply to ALL operations. Never use deprecated selectors.
 
 | Operation | Reference file |
 |---|---|
+| `list-drafts`, `list-published`, `list-scheduled`, `list-submissions`, `list-unlisted` | `references/list-stories.md` |
 | `populate-registry` | `references/populate-registry.md` |
 | `update-article` | `references/update-article.md` |
 | `create-new-article` | `references/create-new-article.md` |
@@ -69,11 +74,3 @@ These apply to ALL operations. Never use deprecated selectors.
 
 Load only the reference file for the requested operation. Do not load all reference files at once.
 
----
-
-## list-drafts (inline — no reference file needed)
-
-1. Navigate to `https://medium.com/me/stories/drafts`
-2. Take a snapshot
-3. Extract all draft article titles and their edit URLs from the page
-4. Present the list to the user as a numbered table: `| # | Title | Edit URL |`

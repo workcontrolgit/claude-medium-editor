@@ -1,59 +1,122 @@
 # populate-registry
 
-Populate `medium/medium-public-url.json` by scraping published articles from Medium, then filtering to a single series.
+Populate `medium/medium-public-url.json` by scraping articles from Medium across multiple tabs, then confirming scope with the user.
 
 ## When to use
 
-Use before `update-series-links` when `medium/medium-public-url.json` doesn't exist or needs to be rebuilt from the live site.
+Use when `medium/medium-public-url.json` doesn't exist or needs to be rebuilt from the live site.
 
 Alternative: run `node scripts/fetch-articles.mjs <username>` for a quick API-based export (does not include pretty public URLs).
 
 ## Steps
 
-### 1. Navigate to published stories
+### 1. Ask the user which publications to include
 
+Before navigating, ask:
+
+> "Which publications should I include? (e.g. 'Scrum and Coke', 'Pickleball', or 'all'). I'll also always include your drafts and scheduled articles."
+
+This scopes the scrape and allows early-stop on large tabs.
+
+### 2. Scrape Drafts tab
+
+Navigate to `https://medium.com/me/stories/drafts`. Extract all rows:
+
+```js
+const rows = document.querySelectorAll('table tbody tr');
+Array.from(rows).map(row => {
+  const link = row.querySelector('a');
+  const title = row.querySelector('h2, h3');
+  const cleanUrl = link ? link.href.split('?')[0] : '';
+  const editId = cleanUrl.split('-').pop();
+  return {
+    title: title ? title.textContent.trim() : '',
+    publication: '',
+    editId,
+    editUrl: `https://medium.com/p/${editId}/edit`,
+    publicUrl: `https://medium.com/p/${editId}`
+  };
+});
 ```
-https://medium.com/me/stories?tab=posts-published
+
+For drafts: `publication` = `""`, `publicUrl` = short redirect form.
+
+### 3. Scrape Scheduled tab
+
+Navigate to `https://medium.com/me/stories?tab=scheduled`. Extract using the same JS as Step 2. For scheduled articles without a publication shown, set `publication: ""`.
+
+### 4. Scrape Submissions tab
+
+Navigate to `https://medium.com/me/stories?tab=submissions-outbox`. Extract rows:
+
+```js
+const rows = document.querySelectorAll('table tbody tr');
+Array.from(rows).map(row => {
+  const link = row.querySelector('a');
+  const title = row.querySelector('h2, h3');
+  const cleanUrl = link ? link.href.split('?')[0] : '';
+  const editId = cleanUrl.split('-').pop();
+  const pub = row.querySelector('[data-testid="storyPublicationName"]') || null;
+  return {
+    title: title ? title.textContent.trim() : '',
+    publication: pub ? pub.textContent.trim() : '',
+    editId,
+    editUrl: `https://medium.com/p/${editId}/edit`,
+    publicUrl: `https://medium.com/p/${editId}`
+  };
+});
 ```
 
-Take a snapshot and confirm the Published tab is active.
+Submissions are awaiting publication approval — use the short `publicUrl` form until published.
 
-### 2. Extract articles from the page
+### 5. Scrape Published tab (with early-stop)
 
-For each row in the table, extract:
-- **title** — from the heading link text
-- **publication** — from the publication name link in the row (e.g. "Scrum and Coke", "Pickleball")
-- **publicUrl** — the `href` of the title link, query string stripped
-- **editId** — last hyphen-separated segment of `publicUrl`
-- **editUrl** — `https://medium.com/p/{editId}/edit`
+Navigate to `https://medium.com/me/stories?tab=posts-published`.
 
-### 3. Scroll for more (if series spans multiple pages)
+Extract the first page. After each scroll pass:
+- Filter rows to only those matching the user's target publications
+- Stop scrolling when all target-publication articles appear stable (two consecutive scrolls yield no new matching rows)
+- Ask the user before each additional scroll if count is already large (>40 rows)
 
-If the target series articles are not all visible, scroll down and re-snapshot until all series parts are captured.
+Extract fields:
 
-### 3a. Also scrape drafts
+```js
+const rows = document.querySelectorAll('table tbody tr');
+Array.from(rows).map(row => {
+  const link = row.querySelector('a');
+  const title = row.querySelector('h2, h3');
+  const pub = row.querySelector('[data-testid="storyPublicationName"], .storyCard__publication a') || null;
+  const cleanUrl = link ? link.href.split('?')[0] : '';
+  const editId = cleanUrl.split('-').pop();
+  return {
+    title: title ? title.textContent.trim() : '',
+    publication: pub ? pub.textContent.trim() : '',
+    editId,
+    editUrl: `https://medium.com/p/${editId}/edit`,
+    publicUrl: cleanUrl || `https://medium.com/p/${editId}`
+  };
+});
+```
 
-Navigate to `https://medium.com/me/stories/drafts`, take a snapshot, and extract drafts using the same fields. For drafts:
-- `publication` — use the publication name if shown, otherwise leave empty string `""`
-- `publicUrl` — use `https://medium.com/p/{editId}` (short redirect form)
+For published articles: `publicUrl` = the full pretty URL (already in `cleanUrl`).
 
-Add draft entries to the extracted list before filtering.
+### 6. Confirm scope with user
 
-### 4. Confirm scope with user
+Present the combined list (drafts + scheduled + submissions + published) grouped by tab. Ask:
 
-Present the full extracted list (published + drafts) and ask:
-"Should I include all articles, or filter to specific ones? (e.g. only Scrum and Coke, or only drafts)"
+> "Found N articles total across tabs. Should I include all, or filter to specific ones?"
 
 Include only the articles the user confirms.
 
-### 5. Assign no extra fields
+### 7. Assign no extra fields
 
-No `series` or `part` assignment needed. Each entry is written exactly as extracted:
+Each entry is written exactly as extracted:
 `title`, `publication`, `editId`, `editUrl`, `publicUrl`.
 
-For drafts with no publication: set `"publication": ""`.
+- Drafts / Scheduled / Submissions: `publicUrl` = `https://medium.com/p/{editId}`
+- Published: `publicUrl` = full pretty URL
 
-### 6. Write the registry
+### 8. Write the registry
 
 Create `medium/` directory if it doesn't exist, then write `medium/medium-public-url.json`:
 
@@ -76,29 +139,23 @@ Create `medium/` directory if it doesn't exist, then write `medium/medium-public
 ]
 ```
 
-For unpublished drafts, use `"publicUrl": "https://medium.com/p/{editId}"` — never leave it empty.
+### 9. Confirm
 
-### 7. Confirm
-
-Report to the user: how many entries written, file path, and any entries using the short draft URL that will need updating after publishing.
+Report: how many entries written, breakdown by tab, and any entries using the short draft URL that will need updating after publishing.
 
 ## publicUrl lifecycle
 
 | Stage | `publicUrl` value |
 |---|---|
-| Draft (not yet submitted) | `https://medium.com/p/{editId}` |
+| Draft / Scheduled / Submission | `https://medium.com/p/{editId}` |
 | Published to a publication | `https://medium.com/{publication}/{slug}-{editId}` |
 
-**Pattern:** `https://medium.com/{publication-name}/{article-title-kebab-case}-{editId}`
-
-Example: `https://medium.com/scrum-and-coke/part-1-the-net-agent-framework-ichatclient-and-mcp-clients-4b52cc179e26`
-
-- Draft `publicUrl` is always `https://medium.com/p/{editId}` — never empty.
-- Once published to a publication, update `publicUrl` to the full pretty URL: `https://medium.com/{publication-slug}/{article-slug}-{editId}`
-- Never leave `publicUrl` empty. Medium limits publishing to 2 articles/day — pre-wiring all links lets you publish on a rolling schedule without breaking navigation.
+- Never leave `publicUrl` empty.
+- Once an article is published to a publication, update `publicUrl` to the full pretty URL.
+- Medium limits publishing to 2 articles/day — pre-wiring all links lets you publish on a rolling schedule without breaking navigation.
 
 ## Notes
 
-- The `editId` is the final 12-character hex segment of any Medium article URL (pretty or short).
-- `editUrl` (`https://medium.com/p/{editId}/edit`) is used only to open the editor — not in series navigation.
-- This operation only scrapes the current page view — Medium shows ~20 articles per load. Scroll or paginate if your series is buried further down.
+- The `editId` is the final 12-character hex segment. Always strip `?source=...` from URLs before extracting: `link.href.split('?')[0]`.
+- `editUrl` is used only to open the editor — it is not the public-facing URL.
+- Published tab may have 300+ articles — always use early-stop and ask the user before excessive scrolling.
