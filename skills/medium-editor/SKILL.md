@@ -27,7 +27,7 @@ Automate Medium.com article editing via the Playwright MCP browser.
 
 `editId` is found in the Medium editor URL: `https://medium.com/p/{editId}/edit`
 
-For `update-links`, the registry `medium/medium-public-url.json` must exist in the current working directory. Run `/medium-editor populate-registry` to build it if missing.
+For `update-links`, the registry lives at `~/medium/medium-public-url.json` (shared across all repos). Run `/medium-editor populate-registry` to build it if missing.
 
 ---
 

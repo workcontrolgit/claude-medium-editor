@@ -4,8 +4,8 @@ Update hyperlinks in a Medium article to use the correct `publicUrl` from the re
 
 ## Prerequisites
 
-`medium/medium-public-url.json` must exist in the current working directory.
-Run `/medium-editor populate-registry` to build it if missing.
+`~/medium/medium-public-url.json` must exist.
+Run `/medium-editor populate-registry` to build it if missing. The registry lives at `~/medium/medium-public-url.json` — shared across all repos.
 
 ## Invocation
 
@@ -18,7 +18,7 @@ Run `/medium-editor populate-registry` to build it if missing.
 
 ### 1. Load registry
 
-Read `medium/medium-public-url.json`. Build a lookup map: `title → { publication, publicUrl }`.
+Read `~/medium/medium-public-url.json`. Build a lookup map: `title → { publication, publicUrl }`.
 
 ### 2. Navigate to article
 
