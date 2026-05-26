@@ -33,18 +33,22 @@ Use the table above to find the URL for the requested operation. Navigate to it.
 ```js
 const rows = document.querySelectorAll('table tbody tr');
 Array.from(rows).map(row => {
-  const link = row.querySelector('a[href*="/edit"]') || row.querySelector('a');
+  const link = row.querySelector('a');
   const title = row.querySelector('h2, h3');
-  const pub = row.querySelector('[data-testid="storyPublicationName"], .storyCard__publication a') || null;
-  const status = row.querySelector('[data-testid="storyStatus"]') || null;
+  const cleanUrl = link ? link.href.split('?')[0] : '';
+  const editId = cleanUrl.split('-').pop();
+  const pubSlug = cleanUrl.match(/medium\.com\/([^/]+)\//)?.[1] || '';
   return {
     title: title ? title.textContent.trim() : (link ? link.textContent.trim() : ''),
-    editUrl: link ? link.href.split('?')[0] : '',
-    publication: pub ? pub.textContent.trim() : '',
-    status: status ? status.textContent.trim() : ''
+    publication: pubSlug,
+    editId,
+    editUrl: `https://medium.com/p/${editId}/edit`,
+    publicUrl: cleanUrl
   };
 });
 ```
+
+**Note:** Publication is derived from the URL slug (e.g. `scrum-and-coke`). For drafts, `cleanUrl` is the edit URL — set `publicUrl` to `https://medium.com/p/${editId}` instead.
 
 ### 3. For `list-published` — handle pagination
 
