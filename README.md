@@ -57,42 +57,57 @@ All commands are invoked as `/medium-editor <operation> [args]`.
 | Operation | Description | Example |
 |---|---|---|
 | `list-drafts` | List all draft articles from your submissions outbox | `/medium-editor list-drafts` |
+| `populate-registry` | Scrape published articles and build `medium/medium-public-url.json` | `/medium-editor populate-registry` |
 | `update-article` | Replace draft body with content from a local markdown file | `/medium-editor update-article abc123 ./post.md` |
 | `create-new-article` | Create a new Medium draft from a local markdown file | `/medium-editor create-new-article ./post.md` |
 | `insert-image` | Insert a local image after a specific anchor paragraph | `/medium-editor insert-image abc123 "Anchor text" ./img.png` |
 | `replace-text` | Replace a specific phrase anywhere in the article | `/medium-editor replace-text abc123 "old text" "new text"` |
-| `update-series-links` | Update all series navigation links to use Medium URLs | `/medium-editor update-series-links` |
+| `update-links` | Update hyperlinks in an article using the registry (title + publication match) | `/medium-editor update-links abc123` or `/medium-editor update-links --all` |
 | `publish-article` | Walk through the full publish flow with topics | `/medium-editor publish-article abc123` |
 
 ### Article Registry (series writers)
 
-If you write a multi-part series, copy `templates/medium-public-url.json` into your project at `medium/medium-public-url.json` and fill in your article details:
+Build the registry at `medium/medium-public-url.json` using the `populate-registry` command or the helper script. Commands like `update-links` use this registry to resolve URLs by title and publication. For one-off edits, pass `editId` directly — no registry needed.
+
+Registry schema:
 
 ```json
 [
   {
-    "part": 1,
     "title": "Part 1: Your Article Title",
+    "publication": "Your Publication Name",
     "editId": "abc123def456",
     "editUrl": "https://medium.com/p/abc123def456/edit",
-    "draftUrl": "https://medium.com/publication/your-slug-abc123def456"
+    "publicUrl": "https://medium.com/your-publication/your-slug-abc123def456"
   }
 ]
 ```
 
-Commands like `update-series-links` use this registry to resolve URLs across all parts. For one-off edits, pass `editId` directly — no registry needed.
+**`publicUrl` lifecycle:**
+
+| Stage | Value |
+|---|---|
+| Draft (not yet submitted) | `https://medium.com/p/{editId}` |
+| Published to a publication | `https://medium.com/{publication}/{slug}-{editId}` |
+
+Use the short form for all drafts — Medium redirects it to the pretty URL once published, so series navigation links resolve correctly even before an article goes live. Once an article is submitted to a publication and published, update `publicUrl` to the full pretty URL. Never leave it empty. This matters because **Medium limits publishing to 2 articles per day** — pre-wiring all links lets you publish a long series on a rolling schedule without breaking navigation.
 
 ### Populate your registry automatically
 
-Run the helper script to fetch all your published articles and generate the registry file:
+**Option A — browser scrape** (includes pretty public URLs, supports multi-series):
+
+```
+/medium-editor populate-registry
+```
+
+**Option B — API script** (faster, but uses short redirect URLs only):
 
 ```bash
 node scripts/fetch-articles.mjs <your-medium-username>
 # e.g. node scripts/fetch-articles.mjs workcontrolgit
 ```
 
-This creates `medium/medium-public-url.json` in your current directory.
-You can then edit the file to set meaningful `part` numbers or reorder entries.
+Both write to `medium/medium-public-url.json`. The file is git-ignored by default.
 
 ---
 
@@ -129,11 +144,12 @@ Medium provides no public write API. The plugin controls the live Medium editor 
        │
        ▼
   references/       ← one file per operation, loaded on demand
+  ├── populate-registry.md
   ├── update-article.md
   ├── create-new-article.md
   ├── insert-image.md
   ├── replace-text.md
-  ├── update-series-links.md
+  ├── update-links.md
   ├── publish-article.md
   ├── dom-facts.md
   └── troubleshooting.md
@@ -162,11 +178,12 @@ claude-medium-editor/
     └── medium-editor/
         ├── SKILL.md           # routing logic + key DOM facts
         └── references/
+            ├── populate-registry.md
             ├── update-article.md
             ├── create-new-article.md
             ├── insert-image.md
             ├── replace-text.md
-            ├── update-series-links.md
+            ├── update-links.md
             ├── publish-article.md
             ├── dom-facts.md
             └── troubleshooting.md
