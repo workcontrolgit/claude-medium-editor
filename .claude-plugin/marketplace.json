@@ -1,0 +1,21 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "claude-medium-editor",
+  "description": "Automate Medium.com article editing using Claude Code and Playwright",
+  "owner": {
+    "name": "Fuji Nguyen",
+    "url": "https://github.com/workcontrolgit"
+  },
+  "plugins": [
+    {
+      "name": "claude-medium-editor",
+      "description": "Automate Medium.com article editing — sync content from local markdown, insert images, update series links, and publish — using Claude Code and Playwright.",
+      "version": "1.0.0",
+      "source": "./",
+      "author": {
+        "name": "Fuji Nguyen",
+        "url": "https://github.com/workcontrolgit"
+      }
+    }
+  ]
+}

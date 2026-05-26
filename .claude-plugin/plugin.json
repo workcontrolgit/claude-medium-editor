@@ -5,11 +5,5 @@
     "name": "Fuji Nguyen",
     "url": "https://github.com/workcontrolgit"
   },
-  "version": "1.0.0",
-  "skills": [
-    {
-      "name": "medium-editor",
-      "path": "skills/medium-editor/SKILL.md"
-    }
-  ]
+  "version": "1.0.0"
 }
