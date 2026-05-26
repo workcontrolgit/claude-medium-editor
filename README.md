@@ -184,16 +184,16 @@ claude-medium-editor/
     └── medium-editor/
         ├── SKILL.md           # routing logic + key DOM facts
         └── references/
-            ├── list-stories.md
-            ├── populate-registry.md
-            ├── update-article.md
-            ├── create-new-article.md
-            ├── insert-image.md
-            ├── replace-text.md
-            ├── update-links.md
-            ├── publish-article.md
-            ├── dom-facts.md
-            └── troubleshooting.md
+            ├── list-stories.md        # list-drafts/published/scheduled/submissions/unlisted
+            ├── populate-registry.md   # populate-registry
+            ├── update-article.md      # update-article
+            ├── create-new-article.md  # create-new-article
+            ├── insert-image.md        # insert-image
+            ├── replace-text.md        # replace-text
+            ├── update-links.md        # update-links, update-links --all
+            ├── publish-article.md     # publish-article
+            ├── dom-facts.md           # shared DOM selectors reference
+            └── troubleshooting.md     # shared troubleshooting guide
 ```
 
 ### Key DOM Selectors
