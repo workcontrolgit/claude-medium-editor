@@ -42,7 +42,7 @@ This registers the `medium-editor` skill and configures the Playwright MCP serve
 5. *(Optional)* Copy the article registry template into your project:
 
 ```bash
-cp <plugin-dir>/templates/medium-public-url.json medium/medium-public-url.json
+cp <plugin-dir>/templates/medium-public-url.json ~/~/medium/medium-public-url.json
 # Fill in your editId values
 ```
 
@@ -57,7 +57,7 @@ All commands are invoked as `/medium-editor <operation> [args]`.
 | Operation | Description | Example |
 |---|---|---|
 | `list-drafts` | List all draft articles from your submissions outbox | `/medium-editor list-drafts` |
-| `populate-registry` | Scrape published articles and build `medium/medium-public-url.json` | `/medium-editor populate-registry` |
+| `populate-registry` | Scrape published articles and build `~/medium/medium-public-url.json` | `/medium-editor populate-registry` |
 | `update-article` | Replace draft body with content from a local markdown file | `/medium-editor update-article abc123 ./post.md` |
 | `create-new-article` | Create a new Medium draft from a local markdown file | `/medium-editor create-new-article ./post.md` |
 | `insert-image` | Insert a local image after a specific anchor paragraph | `/medium-editor insert-image abc123 "Anchor text" ./img.png` |
@@ -67,7 +67,7 @@ All commands are invoked as `/medium-editor <operation> [args]`.
 
 ### Article Registry (series writers)
 
-Build the registry at `medium/medium-public-url.json` using the `populate-registry` command or the helper script. Commands like `update-links` use this registry to resolve URLs by title and publication. For one-off edits, pass `editId` directly — no registry needed.
+Build the registry at `~/medium/medium-public-url.json` using the `populate-registry` command or the helper script. Commands like `update-links` use this registry to resolve URLs by title and publication. For one-off edits, pass `editId` directly — no registry needed.
 
 Registry schema:
 
@@ -107,7 +107,7 @@ node scripts/fetch-articles.mjs <your-medium-username>
 # e.g. node scripts/fetch-articles.mjs workcontrolgit
 ```
 
-Both write to `medium/medium-public-url.json`. The file is git-ignored by default.
+Both write to `~/medium/medium-public-url.json`. This location is outside any repo — no git-ignore needed, and it works regardless of which project you're working in.
 
 ---
 

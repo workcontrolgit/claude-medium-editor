@@ -1,10 +1,10 @@
 # populate-registry
 
-Populate `medium/medium-public-url.json` by scraping articles from Medium across multiple tabs, then confirming scope with the user.
+Populate `~/medium/medium-public-url.json` by scraping articles from Medium across multiple tabs, then confirming scope with the user.
 
 ## When to use
 
-Use when `medium/medium-public-url.json` doesn't exist or needs to be rebuilt from the live site.
+Use when `~/medium/medium-public-url.json` doesn't exist or needs to be rebuilt from the live site.
 
 Alternative: run `node scripts/fetch-articles.mjs <username>` for a quick API-based export (does not include pretty public URLs).
 
@@ -118,7 +118,7 @@ Each entry is written exactly as extracted:
 
 ### 8. Write the registry
 
-Create `medium/` directory if it doesn't exist, then write `medium/medium-public-url.json`:
+Create `~/medium/` directory if it doesn't exist, then write `~/medium/medium-public-url.json`. On Windows this is `C:\Users\{username}\medium\`. This fixed location works regardless of which repo Claude Code is running from:
 
 ```json
 [
