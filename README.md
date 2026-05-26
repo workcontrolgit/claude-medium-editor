@@ -74,6 +74,18 @@ If you write a multi-part series, copy `templates/medium-public-url.json` into y
 
 Commands like `update-series-links` use this registry to resolve URLs across all parts. For one-off edits, pass `editId` directly — no registry needed.
 
+### Populate your registry automatically
+
+Run the helper script to fetch all your published articles and generate the registry file:
+
+```bash
+node scripts/fetch-articles.mjs <your-medium-username>
+# e.g. node scripts/fetch-articles.mjs workcontrolgit
+```
+
+This creates `medium/medium-public-url.json` in your current directory.
+You can then edit the file to set meaningful `part` numbers or reorder entries.
+
 ---
 
 ## Limitations
