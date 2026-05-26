@@ -31,3 +31,39 @@ export async function fetchMediumJson(username, fetchFn = fetch) {
   }
   return res.text();
 }
+
+async function run() {
+  const username = process.argv[2];
+
+  if (!username) {
+    console.error('Usage: node scripts/fetch-articles.mjs <username>');
+    process.exit(1);
+  }
+
+  let raw;
+  try {
+    raw = await fetchMediumJson(username);
+  } catch (err) {
+    console.error(`Error: ${err.message}`);
+    process.exit(1);
+  }
+
+  const posts = parseResponse(raw);
+
+  if (posts.length === 0) {
+    console.warn('Warning: No posts found for @' + username);
+  }
+
+  const registry = mapToRegistry(posts);
+
+  const outDir = join(process.cwd(), 'medium');
+  const outFile = join(outDir, 'medium-public-url.json');
+
+  await mkdir(outDir, { recursive: true });
+  await writeFile(outFile, JSON.stringify(registry, null, 2), 'utf8');
+
+  console.log(`Wrote ${registry.length} articles to medium/medium-public-url.json`);
+}
+
+const isMain = process.argv[1]?.endsWith('fetch-articles.mjs');
+if (isMain) run();
