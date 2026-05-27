@@ -47,7 +47,7 @@ claude plugin marketplace add workcontrolgit/claude-medium-editor
 claude plugin install claude-medium-editor
 ```
 
-The first command registers the plugin marketplace. The second installs the plugin — it registers the `medium-editor` skill in Claude Code and automatically configures the Playwright MCP server. No API keys. No OAuth dance. No config files to edit.
+The first command registers the plugin marketplace. The second installs the plugin — it registers the `medium-editor` skill in Claude Code and automatically configures the Playwright MCP server. No API keys. No OAuth dance. No config files to edit. (You will sign in to Medium once on first launch — more on that in a moment.)
 
 **VS Code users:** Claude Code runs as a VS Code extension. If you already edit markdown in VS Code, you get this for free inside your existing editor. Open the Claude Code panel, type a command, watch the browser open.
 
@@ -89,7 +89,7 @@ Ready to publish:
 /medium-editor publish-article abc123
 ```
 
-Claude walks through the full publish flow — selects topics, auto-generates a 140-character subtitle from the article content, and submits to the Scrum and Coke publication. I watch it happen in the browser in real time.
+Claude walks through the full publish flow — prompting me to confirm topics, presenting a generated subtitle for approval, then submitting to the Scrum and Coke publication once I give the final go-ahead. I watch it happen in the browser in real time.
 
 That's the workflow. Five commands. No browser tab switching.
 
@@ -130,7 +130,7 @@ Claude opens your Medium stories dashboard and scrapes all tabs — drafts, publ
 /medium-editor update-links --all
 ```
 
-Claude reads the registry, opens each article in the editor, finds every hyperlink whose text matches a title in the registry, and rewrites it to the correct Medium URL. It uses `document.execCommand('createLink')` — the same approach Medium's own editor uses internally — so the links are indistinguishable from ones you set manually.
+Claude reads the registry, opens each article in the editor, finds every hyperlink whose text matches a title in the registry, and rewrites it to the correct Medium URL. It uses a browser-level editing command to update each link — the same mechanism Medium's own editor uses internally — so the links are indistinguishable from ones you set manually.
 
 For the "AI Agents & MCP with .NET 10" series — 10+ articles, each with navigation links to all the others — running `update-links --all` after each new part goes live takes about two minutes and replaces what used to be an hour of clicking through tabs.
 
