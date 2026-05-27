@@ -11,12 +11,12 @@ Insert a local image after a specific anchor paragraph in an existing Medium dra
 ## Steps
 
 1. Navigate to `https://medium.com/p/{editId}/edit` (or confirm already on the page from a previous paste operation)
-2. Wait for `.editor-inner[contenteditable="true"]`
+2. Wait for `.postArticle-content[contenteditable="true"]`
 3. Use `browser_evaluate` to locate the anchor paragraph and place the cursor after it:
    ```js
    // Find the paragraph containing the anchor text
    const walker = document.createTreeWalker(
-     document.querySelector('.editor-inner'),
+     document.querySelector('.postArticle-content'),
      NodeFilter.SHOW_TEXT
    );
    let node;

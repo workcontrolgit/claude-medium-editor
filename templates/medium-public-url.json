@@ -1,16 +1,16 @@
 [
   {
-    "part": 1,
     "title": "Part 1: Your Article Title",
+    "publication": "Your Publication Name",
     "editId": "abc123def456",
     "editUrl": "https://medium.com/p/abc123def456/edit",
-    "draftUrl": "https://medium.com/publication/your-slug-abc123def456"
+    "publicUrl": "https://medium.com/your-publication/your-slug-abc123def456"
   },
   {
-    "part": 2,
     "title": "Part 2: Your Article Title",
+    "publication": "Your Publication Name",
     "editId": "def456ghi789",
     "editUrl": "https://medium.com/p/def456ghi789/edit",
-    "draftUrl": "https://medium.com/publication/your-slug-def456ghi789"
+    "publicUrl": "https://medium.com/p/def456ghi789"
   }
 ]

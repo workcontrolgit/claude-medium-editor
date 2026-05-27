@@ -46,7 +46,7 @@ These apply to ALL operations. Never use deprecated selectors.
 
 | Element | Selector |
 |---|---|
-| Editor body | `.editor-inner[contenteditable="true"]` |
+| Editor body | `.postArticle-content[contenteditable="true"]` |
 | Article title | `.graf--title` |
 | Inline image menu button | `[data-testid="editorAddButton"]` |
 | Save status | `div` or `span` with `textContent === 'Saved'` |

@@ -20,7 +20,7 @@ Replace the full body of an existing Medium draft with content from a local mark
    - Lists → `<ul><li>` or `<ol><li>`
    - Include the article title as the first `<h3>`
 3. Navigate to `https://medium.com/p/{editId}/edit`
-4. Wait for `.editor-inner[contenteditable="true"]` to be present
+4. Wait for `.postArticle-content[contenteditable="true"]` to be present
 5. Copy HTML to clipboard via `browser_evaluate`:
    ```js
    const div = document.createElement('div');
