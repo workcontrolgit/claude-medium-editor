@@ -1,5 +1,7 @@
 # I Got Tired of Copy-Pasting to Medium. So I Built a Claude Code Plugin.
 
+![Blog cover image](images/blog_cover.png)
+
 I write a lot. Specifically, I write a multi-part technical series called *AI Agents & MCP with .NET 10* on [Scrum and Coke](https://medium.com/scrum-and-coke). The series walks .NET developers through building a fully working AI-enabled backend from scratch — no Python, no hand-waving, just real code.
 
 I use AI to help draft every article. Claude sits alongside me in VS Code, helps me structure arguments, writes first drafts of code explanations, and catches gaps in my reasoning. The drafting experience is genuinely great.
