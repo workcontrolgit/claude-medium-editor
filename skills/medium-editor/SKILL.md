@@ -22,7 +22,7 @@ Automate Medium.com article editing via the Playwright MCP browser.
 /medium-editor replace-text <editId> "<old text>" "<new text>"
 /medium-editor update-links <editId>
 /medium-editor update-links --all
-/medium-editor publish-article <editId>
+/medium-editor submit-article <editId>
 ```
 
 `editId` is found in the Medium editor URL: `https://medium.com/p/{editId}/edit`
@@ -68,7 +68,7 @@ These apply to ALL operations. Never use deprecated selectors.
 | `insert-image` | `references/insert-image.md` |
 | `replace-text` | `references/replace-text.md` |
 | `update-links` | `references/update-links.md` |
-| `publish-article` | `references/publish-article.md` |
+| `submit-article` | `references/submit-article.md` |
 | DOM facts & selectors | `references/dom-facts.md` |
 | Troubleshooting | `references/troubleshooting.md` |
 

@@ -14,8 +14,32 @@ A Claude Code plugin that automates Medium.com article editing from your termina
 
 ### Prerequisites
 
-- [Claude Code](https://claude.ai/code) installed
-- Node.js 18+ (for Playwright MCP)
+- [VS Code](https://code.visualstudio.com/) — where you write and manage your markdown files
+- A Claude subscription — required to run Claude Code ([claude.ai](https://claude.ai))
+- [Claude Code](https://claude.ai/code) — installed as a VS Code extension or standalone CLI
+- Node.js 18+ — runtime for the Playwright MCP server
+- Playwright MCP — configured automatically during plugin install (see below)
+
+### Playwright MCP
+
+This plugin controls the Medium editor through a real browser using the [Playwright MCP server](https://github.com/microsoft/playwright-mcp). The MCP server exposes browser actions (navigate, click, type, file upload, evaluate JS) as Claude tools.
+
+**You do not need to install Playwright manually.** Running `claude plugin install claude-medium-editor` writes the MCP server configuration to `.mcp.json` in your project automatically. Claude Code picks it up on the next launch.
+
+If you want to verify or manually configure it, the entry in `.mcp.json` looks like this:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    }
+  }
+}
+```
+
+Node.js 18+ must be on your `PATH` for `npx` to resolve the package.
 
 ### Install
 
@@ -25,13 +49,15 @@ A Claude Code plugin that automates Medium.com article editing from your termina
 claude plugin marketplace add workcontrolgit/claude-medium-editor
 ```
 
+This tells Claude Code where to find the plugin — pointing it at the GitHub repository `workcontrolgit/claude-medium-editor` as a source.
+
 **Step 2 — Install the plugin:**
 
 ```bash
 claude plugin install claude-medium-editor
 ```
 
-This registers the `medium-editor` skill and configures the Playwright MCP server automatically.
+This registers the `medium-editor` skill and writes the Playwright MCP server configuration to `.mcp.json` automatically. Restart Claude Code after install to activate the MCP server.
 
 ### First Run
 
@@ -67,7 +93,7 @@ All commands are invoked as `/medium-editor <operation> [args]`.
 | `insert-image` | Insert a local image after a specific anchor paragraph | `/medium-editor insert-image abc123 "Anchor text" ./img.png` |
 | `replace-text` | Replace a specific phrase anywhere in the article | `/medium-editor replace-text abc123 "old text" "new text"` |
 | `update-links` | Update hyperlinks in an article using the registry (title + publication match) | `/medium-editor update-links abc123` or `/medium-editor update-links --all` |
-| `publish-article` | Walk through the full publish flow with topics | `/medium-editor publish-article abc123` |
+| `submit-article` | Walk through the full publish flow with topics | `/medium-editor submit-article abc123` |
 
 ### Article Registry (series writers)
 
@@ -115,6 +141,12 @@ Both write to `~/medium/medium-public-url.json`. This location is outside any re
 
 ---
 
+## Disclaimer
+
+This plugin automates the cut-and-paste workflow — it pushes your content to Medium as a draft and can submit it to a publication for review. It does **not** publish directly. Final publishing still requires you to approve and click Publish in the Medium editor.
+
+Use this tool at your own risk. Browser automation interacts with a live editor and can corrupt articles in unexpected ways. Always keep your local markdown file as the source of truth. **Test with a small, throwaway draft before using it on articles you care about.**
+
 ## Limitations
 
 ### Hard (no workaround)
@@ -156,7 +188,7 @@ Medium provides no public write API. The plugin controls the live Medium editor 
   ├── insert-image.md        insert-image
   ├── replace-text.md        replace-text
   ├── update-links.md        update-links, update-links --all
-  ├── publish-article.md     publish-article
+  ├── submit-article.md     submit-article
   ├── dom-facts.md           shared DOM selectors reference
   └── troubleshooting.md     shared troubleshooting guide
        │
@@ -191,7 +223,7 @@ claude-medium-editor/
             ├── insert-image.md        # insert-image
             ├── replace-text.md        # replace-text
             ├── update-links.md        # update-links, update-links --all
-            ├── publish-article.md     # publish-article
+            ├── submit-article.md     # submit-article
             ├── dom-facts.md           # shared DOM selectors reference
             └── troubleshooting.md     # shared troubleshooting guide
 ```
@@ -223,7 +255,27 @@ These constraints were discovered through live editor testing. Violating them ca
 
 ---
 
+## Reporting Issues
+
+Found a bug or a broken selector after a Medium editor update? Open an issue on GitHub:
+
+👉 [github.com/workcontrolgit/claude-medium-editor/issues](https://github.com/workcontrolgit/claude-medium-editor/issues)
+
+Please include:
+- The command you ran (e.g. `create-new-article`, `update-links`)
+- What happened vs. what you expected
+- Any error messages from the Claude Code panel or browser console
+
+Medium occasionally redesigns its editor, which can break DOM selectors. Issues like these are usually quick fixes — a clear report helps a lot.
+
 ## Contributing
+
+Pull requests are welcome. To contribute:
+
+1. Fork the repo and create a branch from `main`
+2. Make your changes — for selector fixes, update the relevant file in `skills/medium-editor/references/`
+3. Test against a real Medium draft before submitting
+4. Open a pull request with a description of what changed and why
 
 ### Adding a New Platform Skill
 

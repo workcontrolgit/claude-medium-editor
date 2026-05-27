@@ -22,5 +22,5 @@ Create a new Medium draft from a local markdown file.
 
 ## Notes
 
-- The new draft is not published. Use `publish-article` to publish it.
+- The new draft is not published. Use `submit-article` to publish it.
 - If the user wants to add images, use `insert-image` after this step — do not navigate away first.

@@ -4,11 +4,11 @@
 
 I write a lot. For example, I write a multi-part technical series called [*AI Agents & MCP with .NET 10*](https://medium.com/scrum-and-coke/ai-agents-mcp-with-net-10-preface-64314313e3e7) on [Scrum and Coke](https://medium.com/scrum-and-coke). The series walks .NET developers through building a fully working AI-enabled backend from scratch — no Python, no hand-waving, just real code.
 
-I use AI to help draft every article. Claude sits alongside me in VS Code, helps me structure arguments, writes first drafts of code explanations, and catches gaps in my reasoning. The drafting experience is genuinely great.
+I use AI to help proofread every article. Claude sits alongside me in VS Code, helps me tighten arguments, refines code explanations, and catches gaps in my reasoning. The proofreading experience is genuinely great.
 
 The publishing experience is not.
 
-Here's what the old workflow looked like: finish a draft in markdown, open Medium, create a new story, copy the markdown, paste it, watch Medium mangle the formatting, spend ten minutes fixing headers and code blocks, then go back to every previous article in the series and manually update the navigation links to point to the new one. Part 4 links to Parts 1, 2, and 3. Part 5 links to 1, 2, 3, and 4. By Part 8, updating links meant opening eight browser tabs and making dozens of manual edits.
+Here's what the old workflow looked like: finish a draft in markdown, open Medium, create a new story, copy the markdown, paste it, watch Medium mangle the formatting, spend ten minutes fixing headers and code blocks, then go back to every previous article in the series and manually update the navigation links to point to the new one. Part 4 links to Parts 1, 2, and 3. Part 5 links to 1, 2, 3, and 4. By Part 6, updating links meant opening six browser tabs and making dozens of manual edits.
 
 Every single time.
 
@@ -16,13 +16,9 @@ I kept looking for a better way. Every automation guide I found referenced the M
 
 ## The API That No Longer Exists
 
-Medium launched a write API years ago. It let developers programmatically create and publish posts. Every integration tool, every third-party publisher, every "automate your Medium posting" tutorial was built on top of it.
+Medium launched a write API years ago. Developers used it to programmatically create and publish posts, and most third-party publishing tools were built on top of it.
 
-It's gone now.
-
-Medium deprecated the public write API and it is no longer available for new integrations. There is no official alternative. No webhook. No export/import pipeline that preserves formatting. If you want content on Medium, you put it there manually — one browser session at a time.
-
-This isn't a tooling gap. It's a policy decision, and it's not going away.
+Medium deprecated the public write API. It is no longer available for new integrations, and there is no official replacement. If you want content on Medium today, you put it there through the browser.
 
 I spent an afternoon looking for workarounds. Nothing worked. So I started thinking differently.
 
@@ -40,16 +36,29 @@ That's the foundation of `claude-medium-editor`.
 
 ## Setup in Two Commands
 
-You need two things installed: [Claude Code](https://claude.ai/code) and Node.js 18+. That's it.
+Full installation guide and README: [github.com/workcontrolgit/claude-medium-editor](https://github.com/workcontrolgit/claude-medium-editor)
+
+You need the following before you start:
+
+- **[VS Code](https://code.visualstudio.com/)** — where you write and manage your markdown files
+- **A Claude subscription** — required to run Claude Code ([claude.ai](https://claude.ai))
+- **[Claude Code](https://claude.ai/code)** — Anthropic's CLI, installed as a VS Code extension or standalone CLI
+- **Node.js 18+** — runtime for the plugin
+- **Playwright** — installed automatically by the plugin; no manual setup needed
 
 Then, in any terminal:
 
 ```bash
 claude plugin marketplace add workcontrolgit/claude-medium-editor
+```
+
+This is a one-time registration step. It tells Claude Code where to find the plugin — pointing it at the GitHub repository `workcontrolgit/claude-medium-editor` as a source. Without this, the next command wouldn't know where to fetch from.
+
+```bash
 claude plugin install claude-medium-editor
 ```
 
-The first command registers the plugin marketplace. The second installs the plugin — it registers the `medium-editor` skill in Claude Code and automatically configures the Playwright MCP server. No API keys. No OAuth dance. No config files to edit. (You will sign in to Medium once on first launch — more on that in a moment.)
+This does the actual install. It registers the `medium-editor` skill in Claude Code and automatically configures the Playwright MCP server so Claude can control a real browser. No API keys. No OAuth dance. No config files to edit. (You will sign in to Medium once on first launch — more on that in a moment.)
 
 **VS Code users:** Claude Code runs as a VS Code extension. If you already edit markdown in VS Code, you get this for free inside your existing editor. Open the Claude Code panel, type a command, watch the browser open.
 
@@ -61,7 +70,7 @@ That's the entire setup.
 
 Here's what publishing looks like now for my .NET series.
 
-I finish drafting `preface.md` in VS Code. Claude helped me write it. I open the Claude Code panel and type:
+I finish drafting `preface.md` in VS Code. Claude helped me proofread it. I open the Claude Code panel and type:
 
 ```
 /medium-editor create-new-article ./preface.md
@@ -85,10 +94,10 @@ Spot a placeholder I forgot to fill in:
 
 Done in seconds. No scrolling, no hunting.
 
-Ready to publish:
+Ready to submit to publication:
 
 ```
-/medium-editor publish-article abc123
+/medium-editor submit-article abc123
 ```
 
 Claude walks through the full publish flow — prompting me to confirm topics, presenting a generated subtitle for approval, then submitting to the Scrum and Coke publication once I give the final go-ahead. I watch it happen in the browser in real time.
@@ -114,7 +123,7 @@ https://medium.com/scrum-and-coke/ai-agents-mcp-with-net-10-preface-64314313e3e7
 https://medium.com/scrum-and-coke/ai-agents-mcp-with-net-10-project-setup-...
 ```
 
-And every time a new part publishes, I need to go back and update the navigation links in every previous article. For a 10-part series, that's dozens of manual edits per release.
+And every time a new part publishes, I need to go back and update the navigation links in every previous article. For a 6-part series, that's dozens of manual edits per release.
 
 `update-links` does all of that in one command.
 
@@ -134,7 +143,7 @@ Claude opens your Medium stories dashboard and scrapes all tabs — drafts, publ
 
 Claude reads the registry, opens each article in the editor, finds every hyperlink whose text matches a title in the registry, and rewrites it to the correct Medium URL. It uses a browser-level editing command to update each link — the same mechanism Medium's own editor uses internally — so the links are indistinguishable from ones you set manually.
 
-For the "AI Agents & MCP with .NET 10" series — 10+ articles, each with navigation links to all the others — running `update-links --all` after each new part goes live takes about two minutes and replaces what used to be an hour of clicking through tabs.
+For the "AI Agents & MCP with .NET 10" series — 6 articles, each with navigation links to all the others — running `update-links --all` after each new part goes live takes about two minutes and replaces what used to be an hour of clicking through tabs.
 
 The registry schema is simple:
 
@@ -166,11 +175,11 @@ You can also update a single article: `/medium-editor update-links abc123`. The 
 | `insert-image` | Insert a local image after a specific anchor paragraph |
 | `replace-text` | Replace a phrase anywhere in the article |
 | `update-links` | Rewrite cross-article links using the registry |
-| `publish-article` | Walk the full publish flow: topics, subtitle, submit |
+| `submit-article` | Walk the submission flow: topics, subtitle, submit to publication |
 
 ## Limitations Worth Knowing
 
-This tool is honest about what it can't do.
+**Disclaimer:** This plugin automates the cut-and-paste workflow — it pushes your content to Medium as a draft and can submit it to a publication for review. It does not publish directly. Final publishing still requires you to approve and click Publish in the Medium editor. Use this tool at your own risk. Browser automation interacts with a live editor and can corrupt articles in unexpected ways. Always keep your local markdown file as the source of truth, and test with a small, throwaway draft before using it on articles you care about.
 
 **One manual login required.** Cloudflare blocks fresh headless browsers on first contact. You sign in once, the session persists. This is a real constraint — not something the tool can work around.
 
@@ -184,7 +193,7 @@ This tool is honest about what it can't do.
 
 ## You Just Read the Demo
 
-This article was written in markdown in VS Code. Claude helped draft it. It was published to Medium using `/medium-editor create-new-article`. The navigation links back to the AI Agents & MCP series were updated with `/medium-editor update-links`.
+This article was written in markdown in VS Code. Claude helped proofread it. It was published to Medium using `/medium-editor create-new-article`. The navigation links back to the AI Agents & MCP series were updated with `/medium-editor update-links`.
 
 No browser tabs. No copy-paste. No manual link hunting.
 
