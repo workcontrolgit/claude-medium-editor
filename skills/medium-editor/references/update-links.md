@@ -22,13 +22,13 @@ Read `~/medium/medium-public-url.json`. Build a lookup map: `title → { publica
 
 ### 2. Navigate to article
 
-Navigate to `https://medium.com/p/<editId>/edit`. Wait for `.postArticle-content[contenteditable="true"]`.
+Navigate to `https://medium.com/p/<editId>/edit`. Wait for `.editor-inner[contenteditable="true"]`.
 
 ### 3. Extract all hyperlinks in the article
 
 ```js
 const walker = document.createTreeWalker(
-  document.querySelector('.postArticle-content'),
+  document.querySelector('.editor-inner'),
   NodeFilter.SHOW_ELEMENT
 );
 const links = [];
