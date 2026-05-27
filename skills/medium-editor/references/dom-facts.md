@@ -6,7 +6,7 @@ Critical DOM facts and behavioral constraints for Medium's editor. These were di
 
 | Element | Selector | Notes |
 |---|---|---|
-| Editor body | `.editor-inner[contenteditable="true"]` | Use this, NOT `.postArticle-content` (deprecated) |
+| Editor body | `.postArticle-content[contenteditable="true"]` | Verified live 2026-05-27. `.editor-inner` no longer exists in Medium's DOM. |
 | Article title | `.graf--title` | First block in editor |
 | Inline image menu | `[data-testid="editorAddButton"]` | Appears when cursor is on a blank `<p>` |
 | Save status | `div`/`span` with `textContent === 'Saved'` | Poll up to 15s after changes |

@@ -10,7 +10,7 @@ Walk through the full Medium publish flow for a draft — setting the story prev
 
 ### 1. Navigate to the editor
 
-Navigate to `https://medium.com/p/{editId}/edit`. Wait for `.editor-inner[contenteditable="true"]`.
+Navigate to `https://medium.com/p/{editId}/edit`. Wait for `.postArticle-content[contenteditable="true"]`.
 
 ### 2. Click the Publish button
 
@@ -27,10 +27,10 @@ Wait for the page to load. Confirm the three sections are visible: **Story previ
 
 #### Preview subtitle (auto-generate)
 
-Before navigating to the submission page, read the article body from `.editor-inner[contenteditable="true"]`:
+Before navigating to the submission page, read the article body from `.postArticle-content[contenteditable="true"]`:
 
 ```js
-document.querySelector('.editor-inner[contenteditable="true"]').innerText.trim().substring(0, 2000);
+document.querySelector('.postArticle-content[contenteditable="true"]').innerText.trim().substring(0, 2000);
 ```
 
 Use the article text to write a concise, compelling subtitle — max 140 characters. The subtitle should summarise the article's key value or finding in plain language, suitable as a teaser for readers browsing Medium.

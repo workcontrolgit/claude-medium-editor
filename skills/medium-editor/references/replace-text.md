@@ -11,11 +11,11 @@ Replace a specific phrase anywhere in an existing Medium draft.
 ## Steps
 
 1. Navigate to `https://medium.com/p/{editId}/edit`
-2. Wait for `.editor-inner[contenteditable="true"]`
+2. Wait for `.postArticle-content[contenteditable="true"]`
 3. Use `browser_evaluate` to locate the text node and replace it:
    ```js
    const walker = document.createTreeWalker(
-     document.querySelector('.editor-inner'),
+     document.querySelector('.postArticle-content'),
      NodeFilter.SHOW_TEXT
    );
    let replaced = false;
@@ -42,6 +42,6 @@ Replace a specific phrase anywhere in an existing Medium draft.
 
 ## Notes
 
-- For replacing URLs or links, use `update-series-links` instead — it handles the full series registry.
+- For replacing URLs or links, use `update-links` instead — it handles the full series registry.
 - For large content replacement (full article body), use `update-article` instead — `execCommand('delete')` on large ranges does not persist through Medium's save API.
 - If the phrase appears multiple times, this replaces only the first occurrence. Run the command again for subsequent occurrences.
